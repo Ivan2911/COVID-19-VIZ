@@ -1,2 +1,2 @@
 # COVID-19-VIZ
-COVID-19 Vizualisation
+COVID-19 Visualization
