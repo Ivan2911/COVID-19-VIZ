@@ -16,9 +16,23 @@ deaths = pd.read_csv(deaths_url)
 recoveries_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv'
 recoveries = pd.read_csv(recoveries_url)
 
+## Unpivot the data
+date_columns = confirmed_cases.columns[4:]
+id_vars_columns = confirmed_cases.columns[:4]
+confirmed_unpivoted = confirmed_cases.melt(id_vars=id_vars_columns, value_vars=date_columns, var_name='date', value_name='confirmed')
+
+date_columns = deaths.columns[4:]
+id_vars_columns = deaths.columns[:4]
+death_unpivoted = deaths.melt(id_vars=id_vars_columns, value_vars=date_columns, var_name='date', value_name='death')
+
+date_columns = recoveries.columns[4:]
+id_vars_columns = recoveries.columns[:4]
+recovered_unpivoted = recoveries.melt(id_vars=id_vars_columns, value_vars=date_columns, var_name='date', value_name='recovered')
+
+
 # Merge the data sets into a single dataframe
-df = confirmed_cases.merge(deaths, on='date')
-df = df.merge(recoveries, on='date')
+df = confirmed_unpivoted.merge(death_unpivoted, on='date')
+df = df.merge(recovered_unpivoted, on='date')
 
 # Add a column for the country
 df['country'] = df['Country/Region']
