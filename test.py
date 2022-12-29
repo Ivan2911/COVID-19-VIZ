@@ -12,7 +12,7 @@ import calendar
 #from wordcloud import WordCloud          # pip install wordcloud
 
 # Lottie by Emil - https://github.com/thedirtyfew/dash-extensions
-url_global = "https://assets3.lottiefiles.com/packages/lf20_nptqyaby.json"
+url_global_casses = "https://assets10.lottiefiles.com/packages/lf20_4cuwsw1e.json"
 url_death = "https://assets9.lottiefiles.com/private_files/lf30_qufxtzzx.json"
 url_recovered = "https://assets8.lottiefiles.com/packages/lf20_txJcSM.json"
 url_active = "https://assets9.lottiefiles.com/packages/lf20_tk0uford.json"
@@ -29,8 +29,8 @@ app.layout = dbc.Container([
             ],className='mb-2'),
             dbc.Card([
                 dbc.CardBody([
-                    dbc.CardLink("Charming Data", target="_blank",
-                                 href="https://youtube.com/charmingdata"
+                    dbc.CardLink("Source Code: GitHub", target="_blank",
+                                 href="https://github.com/Ivan2911/COVID-19-VIZ"
                     )
                 ])
             ]),
@@ -58,17 +58,18 @@ app.layout = dbc.Container([
         #Global Cases
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader(Lottie(options=options, width="67%", height="2%", url=url_global)),
+                dbc.CardHeader(Lottie(options=options, width="30%", height="50%", url=url_global_casses), className="card-header-fixed-size"),
                 dbc.CardBody([
-                    html.H6('Global Cases'),
-                    html.H2(id='content-global_cases', children="000")
+                    html.H6('Global Casses'),
+                    html.H2(id='content-global_casses', children="000")
                 ], style={'textAlign':'center'})
             ]),
         ], width=3),
+
         #Global Deaths
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader(Lottie(options=options, width="32%", height="50%", url=url_death)),
+                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_death), className="card-header-fixed-size"),
                 dbc.CardBody([
                     html.H6('Global Deaths'),
                     html.H2(id='content-global_deaths', children="000")
@@ -78,7 +79,7 @@ app.layout = dbc.Container([
         #Global Recovered
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader(Lottie(options=options, width="25%", height="50%", url=url_recovered)),
+                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
                 dbc.CardBody([
                     html.H6('Global Recovered'),
                     html.H2(id='content-global_recovered', children="000")
@@ -88,13 +89,14 @@ app.layout = dbc.Container([
         #Global Active
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader(Lottie(options=options, width="53%", height="50%", url=url_active)),
+                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
                 dbc.CardBody([
                     html.H6('Global Active'),
                     html.H2(id='content-global_active', children="000")
                 ], style={'textAlign': 'center'})
             ]),
         ], width=3),
+
     ],className='mb-3'),
 
     #Graph Rows
