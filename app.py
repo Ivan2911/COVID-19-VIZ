@@ -1,3 +1,4 @@
+import pandas as pd
 import dash
 from dash import dcc
 from dash import html
@@ -31,8 +32,19 @@ recovered_unpivoted = recoveries.melt(id_vars=id_vars_columns, value_vars=date_c
 
 
 # Merge the data sets into a single dataframe
-df = confirmed_unpivoted.merge(death_unpivoted, on='date')
-df = df.merge(recovered_unpivoted, on='date')
+df = confirmed_unpivoted.merge(right = death_unpivoted, how = "left", on=["Province/State", "Country/Region", "Lat","Long","date"])
+df = df.merge(right = recovered_unpivoted, how = "left", on=["Province/State", "Country/Region", "Lat","Long","date"])
+
+#null replacments
+df["recovered"] = df["recovered"].fillna(0)
+
+#generate active columns
+df["active"] = df["confirmed"] - df["death"] - df["recovered"]
+
+#derive more data
+global_sum_by_date_df = df.groupby(["date"])[["confirmed","death","recovered","active"]].sum().reset_index()
+country_sum_by_date_df = df.groupby(["date","Country/Region"])[["confirmed","death","recovered","active"]].sum().reset_index()
+
 
 # Add a column for the country
 df['country'] = df['Country/Region']
