@@ -141,6 +141,15 @@ app.layout = dbc.Container([
     ],className='mb-2'),
 ], fluid=True)
 
+#Update: Global cards information
+@app.callback(
+    Output("content-global_casses", "children"),
+    Output("content-global_deaths", "children"),
+    Output("content-global_recovered", "children"),
+    Output("content-global_active", "children"),
+    
+)
+
 
 
 if __name__=='__main__':

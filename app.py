@@ -1,9 +1,14 @@
 import pandas as pd
 import dash
 from dash import dcc
+import dash_bootstrap_components as dbc
 from dash import html
 import pandas as pd
 from dash.dependencies import Input, Output
+
+#========================================#
+#         DATA PROCESSING                #
+#========================================#
 
 # Load the confirmed cases data set
 confirmed_cases_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/9c3583084c24675d144bb121930c6dee3f80f370/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
@@ -41,25 +46,48 @@ df["recovered"] = df["recovered"].fillna(0)
 #generate active columns
 df["active"] = df["confirmed"] - df["death"] - df["recovered"]
 
+#Change the date format
+df['date'] = pd.to_datetime(df['date'])
+
 #derive more data
 global_sum_by_date_df = df.groupby(["date"])[["confirmed","death","recovered","active"]].sum().reset_index()
 country_sum_by_date_df = df.groupby(["date","Country/Region"])[["confirmed","death","recovered","active"]].sum().reset_index()
 
 
-# Add a column for the country
-df['country'] = df['Country/Region']
+#Last update date
+last_update= df["date"].iloc[-1].strftime('%Y-%m-%d')
+
+
+#========================================#
+#             APLICATIION                #
+#========================================#
 
 # Create the Dash app
 app = dash.Dash()
 
-# Create the dropdown menu
-dropdown = dcc.Dropdown(
-    id='country-dropdown',
-    options=[{'label': country, 'value': country} for country in df['country'].unique()],
-    value='Global'
-)
+# Application Layout
+app.layout = dbc.Container([
 
-# Create the callback function
+
+
+
+
+
+    
+])
+
+
+
+
+
+
+
+
+
+])
+
+
+# Callback Function
 @app.callback(
     Output('covid-19-visualization', 'figure'),
     [Input('country-dropdown', 'value')]
