@@ -146,10 +146,9 @@ app.layout = dbc.Container([
     Output("content-global_casses", "children"),
     Output("content-global_deaths", "children"),
     Output("content-global_recovered", "children"),
-    Output("content-global_active", "children"),
-    
+    Output("content-global_active", "children"),    
 )
-
+def global_card
 
 
 if __name__=='__main__':
