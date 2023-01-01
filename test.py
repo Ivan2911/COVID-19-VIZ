@@ -101,21 +101,36 @@ app.layout = dbc.Container([
 
     #Graph Rows
     dbc.Row([
+        #Graph
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
                     dcc.Graph(id='line-chart', figure={}),
                 ])
             ]),
-        ], width=6),
+        ], width=9),
+
+        #KPI
         dbc.Col([
             dbc.Card([
+                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
                 dbc.CardBody([
-                    dcc.Graph(id='bar-chart', figure={}),
-                ])
-            ]),
-        ], width=4),
+                    html.H6('Global Recovered'),
+                    html.H2(id='content-global_recovered', children="000")
+                ], style={'textAlign':'center'})
+            ], className='mb-5'),
+            
+            dbc.Card([
+                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H6('Global Active'),
+                    html.H2(id='content-global_active', children="000")
+                    ], style={'textAlign': 'center'})
+                ]),
+        ], width=3),
     ],className='mb-2'),
+
+    #Map row
     dbc.Row([
         dbc.Col([
             dbc.Card([
@@ -123,32 +138,12 @@ app.layout = dbc.Container([
                     dcc.Graph(id='TBD', figure={}),
                 ])
             ]),
-        ], width=3),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='pie-chart', figure={}),
-                ])
-            ]),
-        ], width=3),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='wordcloud', figure={}),
-                ])
-            ]),
-        ], width=4),
+        ], width=12),
+
     ],className='mb-2'),
 ], fluid=True)
 
-#Update: Global cards information
-@app.callback(
-    Output("content-global_casses", "children"),
-    Output("content-global_deaths", "children"),
-    Output("content-global_recovered", "children"),
-    Output("content-global_active", "children"),    
-)
-def global_card
+
 
 
 if __name__=='__main__':
