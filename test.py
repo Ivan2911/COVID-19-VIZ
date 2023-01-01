@@ -53,15 +53,15 @@ app.layout = dbc.Container([
         ], width=8),
     ],className='mb-2 mt-2'),
 
-    #Global Row
+    #US Global Row
     dbc.Row([
-        #Global Cases
+        #US Global Cases
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader(Lottie(options=options, width="30%", height="50%", url=url_global_casses), className="card-header-fixed-size"),
                 dbc.CardBody([
-                    html.H6('Global Casses'),
-                    html.H2(id='content-global_casses', children="000")
+                    html.H5('US Global Casses'),
+                    html.H2(id='content-us_global_casses', children="000")
                 ], style={'textAlign':'center'})
             ]),
         ], width=3),
@@ -71,8 +71,8 @@ app.layout = dbc.Container([
             dbc.Card([
                 dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_death), className="card-header-fixed-size"),
                 dbc.CardBody([
-                    html.H6('Global Deaths'),
-                    html.H2(id='content-global_deaths', children="000")
+                    html.H5('US Global Deaths'),
+                    html.H2(id='content-us_global_deaths', children="000")
                 ], style={'textAlign':'center'})
             ]),
         ], width=3),
@@ -81,8 +81,8 @@ app.layout = dbc.Container([
             dbc.Card([
                 dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
                 dbc.CardBody([
-                    html.H6('Global Recovered'),
-                    html.H2(id='content-global_recovered', children="000")
+                    html.H5('US Case Fertility Rate'),
+                    html.H2(id='content-us_CFR', children="000")
                 ], style={'textAlign':'center'})
             ]),
         ], width=3),
@@ -91,8 +91,8 @@ app.layout = dbc.Container([
             dbc.Card([
                 dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
                 dbc.CardBody([
-                    html.H6('Global Active'),
-                    html.H2(id='content-global_active', children="000")
+                    html.H5('US Attack Rate'),
+                    html.H2(id='content-us_attack_rate', children="000")
                 ], style={'textAlign': 'center'})
             ]),
         ], width=3),
