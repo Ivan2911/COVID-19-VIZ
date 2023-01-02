@@ -62,7 +62,7 @@ app.layout = dbc.Container([
                 dbc.CardBody([
                     html.H5('US Global Casses'),
                     html.H2(id='content-us_global_casses', children="000")
-                ], style={'textAlign':'center'})
+                ], style={'textAlign':'center'}, className="card-header-fixed-size")
             ]),
         ], width=3),
 
@@ -76,17 +76,17 @@ app.layout = dbc.Container([
                 ], style={'textAlign':'center'})
             ]),
         ], width=3),
-        #Global Recovered
+        #Global CFR
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
                 dbc.CardBody([
                     html.H5('US Case Fertility Rate'),
                     html.H2(id='content-us_CFR', children="000")
-                ], style={'textAlign':'center'})
+                ], style={'textAlign':'center'}, className="card-header-fixed-size")
             ]),
         ], width=3),
-        #Global Active
+        #Global Attack Rate
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
@@ -101,34 +101,72 @@ app.layout = dbc.Container([
 
     #Graph Rows
     dbc.Row([
+        #State KPI
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Dropdown(
+                        id='my_dropdown',
+                        options=[
+                            {'label': 'Alabama', 'value': 'Alabama'},
+                            {'label': 'Florida', 'value': 'Florida'},
+                            {'label': 'Texas', 'value': 'Texas'}
+                        ],
+                        value='Alabama',
+                        disabled=False,
+                        multi=False,
+                        searchable=True,
+                        search_value='',
+                        placeholder='Please select state...',
+                        clearable=True,
+                        style={'width': "100%"}
+                                ),
+                             ])
+                    ], className='mb-2'),
+
+            dbc.Card([
+                #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H6('Cases'),
+                    html.H2(id='content-state_cases', children="000")
+                            ], style={'textAlign':'center'})
+                    ], className='mb-1'),
+            
+            dbc.Card([
+                #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H6('Death'),
+                    html.H2(id='content-state_death', children="000")
+                    ], style={'textAlign': 'center'})
+                ], className='mb-1'),
+
+           
+            dbc.Card([
+                #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
+                dbc.CardBody([
+                        html.H6('Case Fertility Rate'),
+                        html.H2(id='content-state_CFR', children="000")
+                                ], style={'textAlign':'center'})
+                        ], className='mb-1'),
+            
+            dbc.Card([
+                #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H6('Attack Rate'),
+                    html.H2(id='content-state_attack_rate', children="000")
+                    ], style={'textAlign': 'center'})
+                ], className='mb-1'),
+        ], width=3),
+
         #Graph
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
                     dcc.Graph(id='line-chart', figure={}),
-                ])
-            ]),
-        ], width=9),
-
-        #KPI
-        dbc.Col([
-            dbc.Card([
-                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
-                dbc.CardBody([
-                    html.H6('Global Recovered'),
-                    html.H2(id='content-global_recovered', children="000")
-                ], style={'textAlign':'center'})
-            ], className='mb-5'),
-            
-            dbc.Card([
-                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
-                dbc.CardBody([
-                    html.H6('Global Active'),
-                    html.H2(id='content-global_active', children="000")
-                    ], style={'textAlign': 'center'})
-                ]),
-        ], width=3),
-    ],className='mb-2'),
+                             ])
+                    ]),
+                ], width=9),
+                            ],className='mb-2'),
 
     #Map row
     dbc.Row([
