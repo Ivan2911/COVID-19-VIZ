@@ -1,114 +1,287 @@
-import pandas as pd
-import dash
-from dash import dcc
-import dash_bootstrap_components as dbc
+import dash                              # pip install dash
 from dash import html
-import pandas as pd
-from dash.dependencies import Input, Output
+from dash import dcc
+from dash.dependencies import Output, Input
 
-#========================================#
-#         DATA PROCESSING                #
-#========================================#
-
-# Load the confirmed cases data set
-confirmed_cases_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/9c3583084c24675d144bb121930c6dee3f80f370/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
-confirmed_cases = pd.read_csv(confirmed_cases_url)
-
-# Load the deaths data set
-deaths_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
-deaths = pd.read_csv(deaths_url)
-
-# Load the recoveries data set
-recoveries_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv'
-recoveries = pd.read_csv(recoveries_url)
-
-## Unpivot the data
-date_columns = confirmed_cases.columns[4:]
-id_vars_columns = confirmed_cases.columns[:4]
-confirmed_unpivoted = confirmed_cases.melt(id_vars=id_vars_columns, value_vars=date_columns, var_name='date', value_name='confirmed')
-
-date_columns = deaths.columns[4:]
-id_vars_columns = deaths.columns[:4]
-death_unpivoted = deaths.melt(id_vars=id_vars_columns, value_vars=date_columns, var_name='date', value_name='death')
-
-date_columns = recoveries.columns[4:]
-id_vars_columns = recoveries.columns[:4]
-recovered_unpivoted = recoveries.melt(id_vars=id_vars_columns, value_vars=date_columns, var_name='date', value_name='recovered')
+from dash_extensions import Lottie       # pip install dash-extensions
+import dash_bootstrap_components as dbc  # pip install dash-bootstrap-components
+import plotly.express as px              # pip install plotly
+import pandas as pd                      # pip install pandas
+from datetime import date
+import calendar
+#from wordcloud import WordCloud          # pip install wordcloud
 
 
-# Merge the data sets into a single dataframe
-df = confirmed_unpivoted.merge(right = death_unpivoted, how = "left", on=["Province/State", "Country/Region", "Lat","Long","date"])
-df = df.merge(right = recovered_unpivoted, how = "left", on=["Province/State", "Country/Region", "Lat","Long","date"])
 
-#null replacments
-df["recovered"] = df["recovered"].fillna(0)
+#####################################
+#      Data    
+#####################################
 
-#generate active columns
-df["active"] = df["confirmed"] - df["death"] - df["recovered"]
+#Load and read date
+us2020_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties-2020.csv"
+us2020_cases = pd.read_csv(us2020_url, usecols=['date', 'county', 'state', 'cases', 'deaths'])
+us2021_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties-2021.csv"
+us2021_cases = pd.read_csv(us2021_url, usecols=['date', 'county', 'state', 'cases', 'deaths'])
+us2022_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties-2022.csv"
+us2022_cases = pd.read_csv(us2022_url, usecols=['date', 'county', 'state', 'cases', 'deaths'])
 
-#Change the date format
-df['date'] = pd.to_datetime(df['date'])
+#Fill null value with 0
+us2020_cases["deaths"] = us2020_cases["deaths"].fillna(0)
+us2021_cases["deaths"] = us2021_cases["deaths"].fillna(0)
+us2022_cases["deaths"] = us2022_cases["deaths"].fillna(0)
 
-#derive more data
-global_sum_by_date_df = df.groupby(["date"])[["confirmed","death","recovered","active"]].sum().reset_index()
-country_sum_by_date_df = df.groupby(["date","Country/Region"])[["confirmed","death","recovered","active"]].sum().reset_index()
+# Group by date and grup by date and state
+us2020_date = us2020_cases.groupby(["date"])[["cases","deaths"]].sum().reset_index()
+us2020_state = us2020_cases.groupby(["date", "state"])[["cases","deaths"]].sum().reset_index()
 
+us2021_date = us2021_cases.groupby(["date"])[["cases","deaths"]].sum().reset_index()
+us2021_state = us2021_cases.groupby(["date", "state"])[["cases","deaths"]].sum().reset_index()
 
+us2022_date = us2022_cases.groupby(["date"])[["cases","deaths"]].sum().reset_index()
+us2022_state = us2022_cases.groupby(["date", "state"])[["cases","deaths"]].sum().reset_index()
+
+#Concate the data frame to union 2020, 2021 and 2022
+us_date_df = pd.concat([us2020_date, us2021_date, us2022_date])
+us_state_df = pd.concat([us2020_state, us2021_state, us2022_state])
+
+#Make sure the date is in date format
+us_date_df ['date'] = pd.to_datetime(us_date_df['date'])
+us_state_df ['date'] = pd.to_datetime(us_state_df['date'])
+
+#add a new column called year
+us_state_df['year'] = us_state_df['date'].dt.year
+us_date_df['year'] = us_date_df['date'].dt.year
+
+#Load estimated population data
+pop_df = pd.read_csv('data/estimated_population.csv')
+
+#####################################
+#      Global Data To Show    
+#####################################
 #Last update date
-last_update= df["date"].iloc[-1].strftime('%Y-%m-%d')
+last_update= us_date_df["date"].iloc[-1].strftime('%Y-%m-%d')
+#Global cases
+global_cases = us_date_df["cases"].iloc[-1]
+#Global deaths
+global_deaths = us_date_df["deaths"].iloc[-1]
+#Global CFR
+global_CFR = round(global_deaths/global_cases, 4)
+#Global Attack Rate
+population_2022 = pop_df['2022'].sum()
+global_attack_rate = round(global_cases/population_2022, 4)
+
+#Options list
+unique_state = sorted(us_state_df['state'].unique())
+state_options = [{'label': value, 'value': value} for value in unique_state]
 
 
-#========================================#
-#             APLICATIION                #
-#========================================#
 
-# Create the Dash app
-app = dash.Dash()
+# Lottie by Emil - https://github.com/thedirtyfew/dash-extensions
+url_global_casses = "https://assets10.lottiefiles.com/packages/lf20_4cuwsw1e.json"
+url_death = "https://assets9.lottiefiles.com/private_files/lf30_qufxtzzx.json"
+url_recovered = "https://assets8.lottiefiles.com/packages/lf20_txJcSM.json"
+url_active = "https://assets9.lottiefiles.com/packages/lf20_tk0uford.json"
+options = dict(loop=True, autoplay=True, rendererSettings=dict(preserveAspectRatio='xMidYMid slice'))
 
-# Application Layout
+# Bootstrap themes by Ann: https://hellodash.pythonanywhere.com/theme_explorer
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX])
+
+#####################################
+#      LAYOUT    
+#####################################
+
 app.layout = dbc.Container([
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dbc.CardLink("Source Code: GitHub", target="_blank",
+                                 href="https://github.com/Ivan2911/COVID-19-VIZ",
+                                 className="text-muted font-weight-light"
+                                )
+                            ])
+                    ], className="mb-2 mt-2", style={'border-radius': '8px'}),
+                ], width=2),
+        
+        # Title
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    html.H1('COVID-19', className="text-white font-weight-bold"),
+                    html.H5('Last Updated:' + last_update, className="text-red font-weight-bold")
+                ])
+            ], color="info", className="text-center", style={'border-radius': '8px'}),
+        ], width=8),
 
+    ], className="mb-4 mt-4"), #End of row
 
+    #US Global Row
+    dbc.Row([
+        #US Global Cases
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader(Lottie(options=options, width="30%", height="50%", url=url_global_casses), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H5('US Global Casses'),
+                    html.H2(global_cases)
+                ], style={'textAlign':'center', 'border-radius': '8px'}, className="card-header-fixed-size")
+            ]),
+        ], width=3),
 
+        #Global Deaths
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_death), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H5('US Global Deaths'),
+                    html.H2(global_deaths)
+                ], style={'textAlign':'center'})
+            ]),
+        ], width=3),
+        #Global CFR
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H5('US Case Fertility Rate'),
+                    html.H2(global_CFR)
+                ], style={'textAlign':'center'}, className="card-header-fixed-size")
+            ]),
+        ], width=3),
+        #Global Attack Rate
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H5('US Attack Rate'),
+                    html.H2(global_attack_rate)
+                ], style={'textAlign': 'center'})
+            ]),
+        ], width=3),
 
+    ],className='mb-3'),
 
+    #Graph Rows
+    dbc.Row([
+        #State KPI
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Dropdown(
+                        id='state_dropdown',
+                        options=state_options,
+                        value='Alabama',
+                        disabled=False,
+                        multi=False,
+                        searchable=True,
+                        search_value='',
+                        placeholder='Please select state...',
+                        clearable=True,
+                        style={'width': "100%"},
+                        persistence= True, 
+                        persistence_type='memory'
+                                ),
+                             ])
+                    ], className='mb-2'),
 
-    
-])
+            dbc.Card([
+                #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H6('Cases'),
+                    html.H2(id='content-state_cases', children="000")
+                            ], style={'textAlign':'center'})
+                    ], className='mb-1'),
+            
+            dbc.Card([
+                #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H6('Death'),
+                    html.H2(id='content-state_death', children="000")
+                    ], style={'textAlign': 'center'})
+                ], className='mb-1'),
 
+           
+            dbc.Card([
+                #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
+                dbc.CardBody([
+                        html.H6('Case Fertility Rate'),
+                        html.H2(id='content-state_CFR', children="000")
+                                ], style={'textAlign':'center'})
+                        ], className='mb-1'),
+            
+            dbc.Card([
+                #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
+                dbc.CardBody([
+                    html.H6('Attack Rate'),
+                    html.H2(id='content-state_attack_rate', children="000")
+                    ], style={'textAlign': 'center'})
+                ], className='mb-1'),
+        ], width=3),
 
+        #Graph
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='line-chart', figure={}),
+                             ])
+                    ]),
+                ], width=9),
+                            ],className='mb-2'),
 
+    #Map row
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id='TBD', figure={}),
+                ])
+            ]),
+        ], width=12),
 
+    ],className='mb-2'),
+], fluid=True)
 
+#####################################
+#      CALL BACK     
+#####################################
 
-
-
-
-])
-
-
-# Callback Function
+# Updating the 4 number cards
 @app.callback(
-    Output('covid-19-visualization', 'figure'),
-    [Input('country-dropdown', 'value')]
+    Output('content-state_cases','children'),
+    Output('content-state_death','children'),
+    Output('content-state_CFR','children'),
+    Output('content-state_attack_rate','children'),
+    [Input(component_id='state_dropdown', component_property='value')]
 )
-def update_figure(selected_country):
-    filtered_df = df[df['country'] == selected_country]
-    return {
-        'data': [
-            {'x': filtered_df['date'], 'y': filtered_df['confirmed'], 'type': 'bar', 'name': 'Confirmed Cases'},
-            {'x': filtered_df['date'], 'y': filtered_df['deaths'], 'type': 'bar', 'name': 'Deaths'},
-            {'x': filtered_df['date'], 'y': filtered_df['recoveries'], 'type': 'bar', 'name': 'Recoveries'},
-        ],
-        'layout': {
-            'title': f'COVID-19 Confirmed Cases, Deaths, and Recoveries - {selected_country}'
-        }
-    }
+def update_small_cards(state):
+    #filter by state
+    df_state = us_state_df.loc[us_state_df['state']==state]
 
-# Add the dropdown menu and the Graph component to the app layout
-app.layout = html.Div([dropdown, dcc.Graph(id='covid-19-visualization')])
+    # state cases
+    state_cases = df_state["cases"].iloc[-1]
 
-# Run the app
-if __name__ == '__main__':
-    app.run_server()
+    #state deaths
+    state_deaths = df_state["deaths"].iloc[-1]
 
+    #state CFR
+    state_CFR = round(state_deaths/state_cases, 4)
+
+    #state attack rate
+    population_state_2022 = pop_df.loc[(pop_df['NAME'] == state),'2022']
+    state_attack_rate =  round(state_cases/population_state_2022, 4)
+
+    return state_cases, state_deaths, state_CFR, state_attack_rate
+    
+# Updating the graph
+@app.callback(
+    Output(component_id='line-chart', component_property='figure'),
+    [Input(component_id='state_dropdown', component_property='value')]
+)
+#graph
+def update_graph(state):
+    df_state = us_state_df.loc[us_state_df['state']==state]
+    fig = px.line(df_state , x='date', y=['cases', 'deaths'], title='Covid-19 Cases and Deaths in ' + state)
+    return fig
+
+if __name__=='__main__':
+    app.run_server(debug=True, port=8001)

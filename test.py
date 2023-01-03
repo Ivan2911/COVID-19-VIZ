@@ -74,6 +74,27 @@ global_attack_rate = round(global_cases/population_2022, 4)
 unique_state = sorted(us_state_df['state'].unique())
 state_options = [{'label': value, 'value': value} for value in unique_state]
 
+#Map data frame
+map_df = pd.merge(us2022_state, pop_df, left_on='state', right_on='NAME')
+map_df = map_df[['date','code','state','cases','deaths','2022']]
+map_df.rename(columns={'2022': 'population'}, inplace=True)
+map_df = map_df.loc[(map_df['date']== last_update)]
+
+#Adding CFR and Attack rate
+map_df = map_df.assign(CFR=round(map_df['deaths']/map_df['cases'],4))
+map_df = map_df.assign(**{'attack rate': round(map_df['deaths']/map_df['cases'],4)})
+
+map_fig = px.choropleth(
+    data_frame=map_df,
+    locationmode='USA-states',
+    locations='code',
+    scope="usa",
+    color='cases',
+    hover_data=['state', 'cases','deaths', 'CFR','attack rate'],
+    color_continuous_scale=px.colors.sequential.YlOrRd,
+    labels={'Cases': 'Number of cases'},
+    template='plotly_dark'
+)
 
 
 # Lottie by Emil - https://github.com/thedirtyfew/dash-extensions
@@ -110,7 +131,7 @@ app.layout = dbc.Container([
                     html.H1('COVID-19', className="text-white font-weight-bold"),
                     html.H5('Last Updated:' + last_update, className="text-red font-weight-bold")
                 ])
-            ], color="info", className="text-center", style={'border-radius': '8px'}),
+            ], color="info", className="text-center mb-2 mt-2", style={'border-radius': '8px'}),
         ], width=8),
 
     ], className="mb-4 mt-4"), #End of row
@@ -124,8 +145,8 @@ app.layout = dbc.Container([
                 dbc.CardBody([
                     html.H5('US Global Casses'),
                     html.H2(global_cases)
-                ], style={'textAlign':'center', 'border-radius': '8px'}, className="card-header-fixed-size")
-            ]),
+                ], style={'textAlign':'center'}, className="card-header-fixed-size")
+            ], style={'border-radius': '8px'}),
         ], width=3),
 
         #Global Deaths
@@ -136,7 +157,7 @@ app.layout = dbc.Container([
                     html.H5('US Global Deaths'),
                     html.H2(global_deaths)
                 ], style={'textAlign':'center'})
-            ]),
+            ], style={'border-radius': '8px'}),
         ], width=3),
         #Global CFR
         dbc.Col([
@@ -146,7 +167,7 @@ app.layout = dbc.Container([
                     html.H5('US Case Fertility Rate'),
                     html.H2(global_CFR)
                 ], style={'textAlign':'center'}, className="card-header-fixed-size")
-            ]),
+            ], style={'border-radius': '8px'}),
         ], width=3),
         #Global Attack Rate
         dbc.Col([
@@ -156,7 +177,7 @@ app.layout = dbc.Container([
                     html.H5('US Attack Rate'),
                     html.H2(global_attack_rate)
                 ], style={'textAlign': 'center'})
-            ]),
+            ], style={'border-radius': '8px'}),
         ], width=3),
 
     ],className='mb-3'),
@@ -182,7 +203,7 @@ app.layout = dbc.Container([
                         persistence_type='memory'
                                 ),
                              ])
-                    ], className='mb-2'),
+                    ], className='mb-2', style={'border-radius': '8px'}),
 
             dbc.Card([
                 #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
@@ -190,7 +211,7 @@ app.layout = dbc.Container([
                     html.H6('Cases'),
                     html.H2(id='content-state_cases', children="000")
                             ], style={'textAlign':'center'})
-                    ], className='mb-1'),
+                    ], className='mb-1', style={'border-radius': '50px'}),
             
             dbc.Card([
                 #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
@@ -198,7 +219,7 @@ app.layout = dbc.Container([
                     html.H6('Death'),
                     html.H2(id='content-state_death', children="000")
                     ], style={'textAlign': 'center'})
-                ], className='mb-1'),
+                ], className='mb-1', style={'border-radius': '50px'}),
 
            
             dbc.Card([
@@ -207,7 +228,7 @@ app.layout = dbc.Container([
                         html.H6('Case Fertility Rate'),
                         html.H2(id='content-state_CFR', children="000")
                                 ], style={'textAlign':'center'})
-                        ], className='mb-1'),
+                        ], className='mb-1', style={'border-radius': '50px'}),
             
             dbc.Card([
                 #dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_active), className="card-header-fixed-size"),
@@ -215,7 +236,7 @@ app.layout = dbc.Container([
                     html.H6('Attack Rate'),
                     html.H2(id='content-state_attack_rate', children="000")
                     ], style={'textAlign': 'center'})
-                ], className='mb-1'),
+                ], className='mb-1', style={'border-radius': '50px'}),
         ], width=3),
 
         #Graph
@@ -224,7 +245,7 @@ app.layout = dbc.Container([
                 dbc.CardBody([
                     dcc.Graph(id='line-chart', figure={}),
                              ])
-                    ]),
+                    ], style={'border-radius': '8px'}),
                 ], width=9),
                             ],className='mb-2'),
 
@@ -233,7 +254,7 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
-                    dcc.Graph(id='TBD', figure={}),
+                    dcc.Graph(id='map_fegure', figure= map_fig),
                 ])
             ]),
         ], width=12),
