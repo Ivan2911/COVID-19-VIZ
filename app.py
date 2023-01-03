@@ -198,8 +198,7 @@ app.layout = dbc.Container([
                         multi=False,
                         searchable=True,
                         search_value='',
-                        placeholder='Please select state...',
-                        clearable=True,
+                        clearable=False,
                         style={'width': "100%"},
                         persistence= True, 
                         persistence_type='memory'
@@ -258,7 +257,7 @@ app.layout = dbc.Container([
                 dbc.CardBody([
                     dcc.Graph(id='map_fegure', figure= map_fig),
                 ])
-            ]),
+            ], style={'border-radius': '8px'}),
         ], width=12),
 
     ],className='mb-2'),
