@@ -305,4 +305,5 @@ def update_graph(state):
     return fig
 
 if __name__=='__main__':
-    app.run_server(debug=True, port=8001)
+    #app.run_server(debug=True, port=8001)
+    app(debug=True)

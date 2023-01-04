@@ -305,5 +305,7 @@ def update_graph(state):
     fig = px.line(df_state , x='date', y=['cases', 'deaths'], title='Covid-19 Cases and Deaths in ' + state)
     return fig
 
+server = app.server
 if __name__=='__main__':
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run_server(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    
