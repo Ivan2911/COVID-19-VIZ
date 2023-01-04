@@ -98,10 +98,10 @@ map_fig = px.choropleth(
 
 
 # Lottie by Emil - https://github.com/thedirtyfew/dash-extensions
-url_global_casses = "https://assets10.lottiefiles.com/packages/lf20_4cuwsw1e.json"
+url_global_casses = "https://assets6.lottiefiles.com/packages/lf20_vwcugezu.json"
 url_death = "https://assets9.lottiefiles.com/private_files/lf30_qufxtzzx.json"
-url_recovered = "https://assets8.lottiefiles.com/packages/lf20_txJcSM.json"
-url_active = "https://assets9.lottiefiles.com/packages/lf20_tk0uford.json"
+url_recovered = "https://assets4.lottiefiles.com/packages/lf20_WNIZeHHA0q.json"
+url_active = "https://assets7.lottiefiles.com/packages/lf20_xvqam5qh.json"
 options = dict(loop=True, autoplay=True, rendererSettings=dict(preserveAspectRatio='xMidYMid slice'))
 
 # Bootstrap themes by Ann: https://hellodash.pythonanywhere.com/theme_explorer
@@ -162,7 +162,7 @@ app.layout = dbc.Container([
         #Global CFR
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader(Lottie(options=options, width="30%", height="30%", url=url_recovered), className="card-header-fixed-size"),
+                dbc.CardHeader(Lottie(options=options, width="30%", height="50%", url=url_recovered), className="card-header-fixed-size"),
                 dbc.CardBody([
                     html.H5('US Case Fertility Rate'),
                     html.H2(global_CFR)
@@ -305,5 +305,5 @@ def update_graph(state):
     return fig
 
 if __name__=='__main__':
-    #app.run_server(debug=True, port=8001)
-    app(debug=True)
+    app.run_server(debug=True, port=8001)
+    #app(debug=True)
