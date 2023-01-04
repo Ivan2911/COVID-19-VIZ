@@ -12,7 +12,7 @@ steps:
   # Deploy the container to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: ['run', 'deploy', 'bfaapp', '--image', 'gcr.io/covid19-373603/covid19', '--platform', 'managed', '--region', 'us-central1']
+    args: ['run', 'deploy', 'covid19', '--image', 'gcr.io/covid19-373603/covid19', '--platform', 'managed', '--region', 'us-central1']
 
 images:
   - 'gcr.io/covid19-373603/covid19'
