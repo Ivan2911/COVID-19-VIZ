@@ -1,0 +1,18 @@
+# Define the build steps
+steps:
+  # Build the Docker container
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/covid19-373603/covid19', '.']
+  
+
+  # Push the Docker container to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/covid19-373603/covid19']
+
+  # Deploy the container to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'bfaapp', '--image', 'gcr.io/covid19-373603/covid19', '--platform', 'managed', '--region', 'us-central1']
+
+images:
+  - 'gcr.io/covid19-373603/covid19'
